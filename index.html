@@ -9,140 +9,197 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
   <style>
-    :root {
-      --bg1: #ffd6e7;
-      --bg2: #ffeef6;
-      --card: #ffffffcc;
-      --yes: #ff3b7a;
-      --yesHover: #ff1f68;
+    :root{
+      /* Pink theme */
+      --bg1:#ffc1da;
+      --bg2:#fff0f7;
+      --card:#ffffffcc;
+      --yes:#ff2e7a;
+      --yesHover:#ff0f67;
     }
 
-    * { box-sizing: border-box; }
+    *{ box-sizing:border-box; }
 
-    body {
-      margin: 0;
-      min-height: 100svh;
-      display: grid;
-      place-items: center;
-      background: radial-gradient(circle at top, var(--bg2), var(--bg1));
-      font-family: system-ui, sans-serif;
-      overflow: hidden;
-      padding: 16px;
+    body{
+      margin:0;
+      min-height:100svh;
+      display:grid;
+      place-items:center;
+      background:radial-gradient(circle at top, var(--bg2), var(--bg1));
+      font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      overflow:hidden;
+      padding:16px;
     }
 
-    /* FULL-SCREEN CONFETTI CANVAS */
-    #confettiCanvas {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 9999;
+    /* Full screen confetti canvas */
+    #confettiCanvas{
+      position:fixed;
+      inset:0;
+      width:100vw;
+      height:100vh;
+      pointer-events:none;
+      z-index:9999;
     }
 
-    .card {
-      width: min(720px, 92vw);
-      padding: 26px 22px;
-      background: var(--card);
-      backdrop-filter: blur(10px);
-      border-radius: 22px;
-      text-align: center;
-      box-shadow: 0 18px 60px rgba(0,0,0,.15);
+    /* floating hearts backdrop */
+    .hearts{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      overflow:hidden;
+      opacity:.6;
+    }
+    .heart{
+      position:absolute;
+      bottom:-60px;
+      font-size:18px;
+      animation: floatUp linear infinite;
+      opacity:.8;
+      will-change: transform, opacity;
+      text-shadow: 0 10px 20px rgba(0,0,0,.06);
+    }
+    @keyframes floatUp{
+      from{ transform: translateY(0) scale(1); opacity:0; }
+      12%{ opacity:.85; }
+      to{ transform: translateY(-120vh) scale(1.25); opacity:0; }
     }
 
-    .art {
-      width: min(260px, 80vw);
-      margin: 0 auto 10px;
-      display: block;
-      filter: drop-shadow(0 10px 14px rgba(0,0,0,.12));
+    .card{
+      width:min(740px, 92vw);
+      padding:26px 22px;
+      background:var(--card);
+      backdrop-filter:blur(10px);
+      border-radius:22px;
+      text-align:center;
+      box-shadow:0 18px 60px rgba(0,0,0,.15);
+      position:relative;
+      z-index:1;
     }
 
-    h1 {
-      font-size: clamp(26px, 4vw, 44px);
-      margin: 12px 0 18px;
+    .art{
+      width:min(260px, 80vw);
+      margin:0 auto 10px;
+      display:block;
+      filter:drop-shadow(0 10px 14px rgba(0,0,0,.12));
     }
 
-    .button-zone {
-      position: relative;
-      width: min(520px, 92%);
-      height: 150px;
-      margin: 0 auto;
-      touch-action: none;
+    h1{
+      font-size:clamp(26px, 4vw, 44px);
+      margin:12px 0 6px;
+      letter-spacing:-.02em;
     }
 
-    button {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      padding: 16px 24px;
-      font-size: 18px;
-      font-weight: 800;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 10px 24px rgba(0,0,0,.14);
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform .12s ease, background .12s ease;
+    .sub{
+      margin:0 0 16px;
+      font-size:14px;
+      opacity:.75;
     }
 
-    #yesBtn {
-      left: 18%;
-      background: var(--yes);
-      color: #fff;
-    }
-    #yesBtn:hover { background: var(--yesHover); }
-
-    #noBtn {
-      left: 62%;
-      background: #e5e7eb;
-      color: #111827;
+    .button-zone{
+      position:relative;
+      width:min(520px, 92%);
+      height:170px;
+      margin:0 auto;
+      touch-action:none;
+      user-select:none;
     }
 
-    .hint {
-      margin-top: 10px;
-      font-size: 13px;
-      opacity: .7;
+    button{
+      position:absolute;
+      padding:16px 24px;
+      font-size:18px;
+      font-weight:800;
+      border-radius:999px;
+      border:none;
+      cursor:pointer;
+      box-shadow:0 10px 24px rgba(0,0,0,.14);
+      -webkit-tap-highlight-color:transparent;
+      transition: transform .15s ease, background .12s ease, box-shadow .12s ease;
+      will-change: transform, left, top;
     }
 
-    .result {
-      display: none;
-      margin-top: 18px;
+    /* keep both buttons centered using translate(-50%, -50%) */
+    #yesBtn{
+      left:28%;
+      top:50%;
+      background:var(--yes);
+      color:#fff;
+      transform: translate(-50%, -50%) scale(var(--yesScale, 1));
+    }
+    #yesBtn:hover{ background:var(--yesHover); }
+
+    #noBtn{
+      left:72%;
+      top:50%;
+      background:#ffe0ec;
+      color:#7a0f33;
+      transform: translate(-50%, -50%) scale(var(--noScale, 1));
+    }
+
+    .hint{
+      margin-top:10px;
+      font-size:13px;
+      opacity:.8;
+      min-height:1.2em;
+    }
+
+    .result{
+      display:none;
+      margin-top:18px;
       animation: pop .35s ease;
     }
-
-    .result h2 {
+    .result h2{
       font-size: clamp(30px, 4.5vw, 46px);
-      margin: 10px 0;
+      margin: 10px 0 6px;
+    }
+    .result p{
+      margin:0 0 10px;
+      opacity:.85;
+    }
+    .fireworks{
+      width:min(380px, 90vw);
+      margin:0 auto;
+      display:block;
+      border-radius:16px;
+      box-shadow:0 10px 28px rgba(0,0,0,.12);
     }
 
-    .fireworks {
-      width: min(380px, 90vw);
-      margin: 0 auto;
-      display: block;
+    @keyframes pop{
+      from{ transform:scale(.96); opacity:0; }
+      to{ transform:scale(1); opacity:1; }
     }
 
-    @keyframes pop {
-      from { transform: scale(.96); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+    @keyframes shake{
+      0%{ transform: translate(-50%,-50%) scale(var(--noScale,1)) translateX(0); }
+      25%{ transform: translate(-50%,-50%) scale(var(--noScale,1)) translateX(-7px); }
+      50%{ transform: translate(-50%,-50%) scale(var(--noScale,1)) translateX(7px); }
+      75%{ transform: translate(-50%,-50%) scale(var(--noScale,1)) translateX(-4px); }
+      100%{ transform: translate(-50%,-50%) scale(var(--noScale,1)) translateX(0); }
+    }
+
+    @media (max-width: 420px){
+      .button-zone{ height: 190px; }
+      button{ font-size: 17px; padding: 15px 22px; }
     }
   </style>
 </head>
 
 <body>
   <canvas id="confettiCanvas"></canvas>
+  <div class="hearts" id="hearts"></div>
 
   <main class="card">
-    <!-- ANIMAL WITH HEART -->
-    <svg class="art" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+    <!-- Cute bear + heart -->
+    <svg class="art" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <linearGradient id="fur" x1="0" x2="1">
           <stop offset="0" stop-color="#f7c7a1"/>
           <stop offset="1" stop-color="#f2a97b"/>
         </linearGradient>
         <linearGradient id="heart" x1="0" x2="1">
-          <stop offset="0" stop-color="#ff4d7d"/>
-          <stop offset="1" stop-color="#ff1f68"/>
+          <stop offset="0" stop-color="#ff4d8a"/>
+          <stop offset="1" stop-color="#ff0f67"/>
         </linearGradient>
       </defs>
 
@@ -168,21 +225,22 @@
                C182 160 190 164 190 170
                C190 164 198 160 198 152
                C198 148 194 144 190 144Z"
-            fill="#ff7aa2"/>
+            fill="#ff7aa8"/>
     </svg>
 
-    <h1>nirali will you be my valentine?</h1>
+    <h1 id="title">Sasha, will you be my Valentine? 💗</h1>
+    <p class="sub" id="sub">Pink is the only acceptable answer.</p>
 
     <section class="button-zone" id="zone">
-      <button id="yesBtn">Yes</button>
-      <button id="noBtn">No</button>
+      <button id="yesBtn" style="--yesScale:1">Yes</button>
+      <button id="noBtn" style="--noScale:1">No</button>
     </section>
 
-    <!-- HINT -->
-    <div class="hint" id="hint">“No” seems a bit shy 😈</div>
+    <div class="hint" id="hint">“No” is acting a little suspicious.</div>
 
     <section class="result" id="result">
-      <h2>YAY! 🎉</h2>
+      <h2>YAY SASHA!! 🎉</h2>
+      <p>Locked in for Valentine’s 💘</p>
       <img
         class="fireworks"
         src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif"
@@ -197,8 +255,25 @@
     const noBtn = document.getElementById("noBtn");
     const result = document.getElementById("result");
     const hint = document.getElementById("hint");
+    const title = document.getElementById("title");
+    const sub = document.getElementById("sub");
+    const heartsLayer = document.getElementById("hearts");
 
-    /* ---------- CONFETTI ---------- */
+    /* ---------- Background floating hearts ---------- */
+    function spawnFloatingHeart() {
+      const h = document.createElement("div");
+      h.className = "heart";
+      h.textContent = Math.random() < 0.6 ? "💗" : (Math.random() < 0.5 ? "💖" : "💘");
+      h.style.left = Math.random() * 100 + "vw";
+      h.style.animationDuration = (6 + Math.random() * 6) + "s";
+      h.style.fontSize = (14 + Math.random() * 18) + "px";
+      h.style.opacity = (0.35 + Math.random() * 0.55).toFixed(2);
+      heartsLayer.appendChild(h);
+      setTimeout(() => h.remove(), 13000);
+    }
+    setInterval(spawnFloatingHeart, 650);
+
+    /* ---------- CONFETTI (crisp on high-DPI) ---------- */
     const confettiCanvas = document.getElementById("confettiCanvas");
 
     function resizeConfettiCanvas() {
@@ -207,6 +282,8 @@
       confettiCanvas.height = Math.floor(window.innerHeight * dpr);
       confettiCanvas.style.width = "100vw";
       confettiCanvas.style.height = "100vh";
+      const ctx = confettiCanvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
     resizeConfettiCanvas();
@@ -218,88 +295,152 @@
       useWorker: true
     });
 
+    function heartPopAtElement(el) {
+      const r = el.getBoundingClientRect();
+      const x = (r.left + r.width / 2) / window.innerWidth;
+      const y = (r.top + r.height / 2) / window.innerHeight;
+
+      confettiInstance({
+        particleCount: 18,
+        spread: 50,
+        startVelocity: 18,
+        ticks: 120,
+        origin: { x, y },
+        colors: ["#ff2e7a", "#ff7aa8", "#ffd1e2"]
+      });
+    }
+
     function fullScreenConfetti() {
       const end = Date.now() + 1600;
 
       (function frame() {
         confettiInstance({
-          particleCount: 12,
+          particleCount: 14,
           spread: 90,
-          startVelocity: 45,
-          ticks: 180,
-          origin: { x: Math.random(), y: Math.random() * 0.3 }
+          startVelocity: 42,
+          ticks: 190,
+          origin: { x: Math.random(), y: Math.random() * 0.35 },
+          colors: ["#ff2e7a", "#ff7aa8", "#ffd1e2", "#ffffff"]
         });
         if (Date.now() < end) requestAnimationFrame(frame);
       })();
 
       setTimeout(() => {
         confettiInstance({
-          particleCount: 300,
+          particleCount: 320,
           spread: 140,
-          startVelocity: 60,
-          ticks: 220,
-          origin: { x: 0.5, y: 0.55 }
+          startVelocity: 58,
+          ticks: 240,
+          origin: { x: 0.5, y: 0.55 },
+          colors: ["#ff2e7a", "#ff7aa8", "#ffd1e2", "#ffffff"]
         });
-      }, 300);
+      }, 320);
     }
 
-    /* ---------- YES BUTTON GROWS ---------- */
+    /* ---------- YES grows, NO shrinks ---------- */
     let yesScale = 1;
-    function growYes() {
-      yesScale = Math.min(2.2, yesScale + 0.1);
-      yesBtn.style.transform = `translateY(-50%) scale(${yesScale})`;
+    function growYesAndShrinkNo() {
+      yesScale = Math.min(2.25, yesScale + 0.11);
+      yesBtn.style.setProperty("--yesScale", yesScale.toFixed(2));
+
+      const noScale = Math.max(0.55, 1 - (yesScale - 1) * 0.42);
+      noBtn.style.setProperty("--noScale", noScale.toFixed(2));
     }
 
-    /* ---------- NO BUTTON RUNS AWAY ---------- */
+    /* ---------- NO runs away + text progression ---------- */
+    const noTexts = [
+      "No",
+      "Sasha… you sure?",
+      "Think again 😏",
+      "That’s cold 💔",
+      "Last chance…",
+      "Be honest 😉",
+      "Okay stop 😭",
+      "Just press Yes 💗"
+    ];
+    let noIndex = 0;
+    let dodges = 0;
+
     function clamp(n, min, max) {
       return Math.max(min, Math.min(max, n));
     }
 
-    function moveNo(px, py) {
+    function moveNoAwayFrom(px, py) {
       const z = zone.getBoundingClientRect();
       const b = noBtn.getBoundingClientRect();
 
       let dx = (b.left + b.width / 2) - px;
       let dy = (b.top + b.height / 2) - py;
       let mag = Math.hypot(dx, dy) || 1;
-      dx /= mag;
-      dy /= mag;
+      dx /= mag; dy /= mag;
 
-      let newLeft = (b.left - z.left) + dx * 150;
-      let newTop  = (b.top - z.top) + dy * 150;
+      const curCx = (b.left - z.left) + b.width / 2;
+      const curCy = (b.top - z.top) + b.height / 2;
 
-      newLeft = clamp(newLeft, 0, z.width - b.width);
-      newTop  = clamp(newTop, 0, z.height - b.height);
+      const step = 130 + Math.min(90, dodges * 6);
+      let newCx = curCx + dx * step;
+      let newCy = curCy + dy * step;
 
-      noBtn.style.left = newLeft + "px";
-      noBtn.style.top = newTop + "px";
-      noBtn.style.transform = "none";
+      newCx = clamp(newCx, b.width / 2, z.width - b.width / 2);
+      newCy = clamp(newCy, b.height / 2, z.height - b.height / 2);
 
-      growYes();
+      noBtn.style.left = newCx + "px";
+      noBtn.style.top = newCy + "px";
+
+      dodges++;
+      noIndex = Math.min(noIndex + 1, noTexts.length - 1);
+      noBtn.textContent = noTexts[noIndex];
+
+      heartPopAtElement(noBtn);
+      growYesAndShrinkNo();
+
+      if (dodges === 3) {
+        hint.textContent = "No is literally running from you 😭";
+        sub.textContent = "Okay… be nice to the button.";
+      }
+      if (dodges === 6) {
+        title.textContent = "Sasha… c’mon 💖 will you be my Valentine?";
+        hint.textContent = "This is your sign.";
+      }
+      if (dodges >= 9) {
+        hint.textContent = "Universe says: click Yes 💗";
+      }
     }
 
-    zone.addEventListener("pointermove", e => {
+    function maybeDodge(e) {
       const b = noBtn.getBoundingClientRect();
       const d = Math.hypot(
         (b.left + b.width / 2) - e.clientX,
         (b.top + b.height / 2) - e.clientY
       );
-      if (d < 140) moveNo(e.clientX, e.clientY);
+      if (d < 150) moveNoAwayFrom(e.clientX, e.clientY);
+    }
+
+    zone.addEventListener("pointermove", maybeDodge);
+    zone.addEventListener("pointerdown", maybeDodge);
+
+    noBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      noBtn.style.animation = "shake 0.32s";
+      setTimeout(() => (noBtn.style.animation = ""), 320);
+
+      const b = noBtn.getBoundingClientRect();
+      moveNoAwayFrom(
+        b.left + b.width / 2 + (Math.random()*40-20),
+        b.top + b.height / 2 + (Math.random()*40-20)
+      );
     });
 
-    noBtn.addEventListener("click", e => e.preventDefault());
-
-    /* ---------- YES CLICK ---------- */
+    /* ---------- YES click ---------- */
     yesBtn.addEventListener("click", () => {
       zone.style.display = "none";
-      hint.style.display = "none";     // HIDE THE HINT
+      hint.style.display = "none";
       result.style.display = "block";
+      sub.textContent = "Pink-approved 💗";
       resizeConfettiCanvas();
       fullScreenConfetti();
+      heartPopAtElement(yesBtn);
     });
   </script>
 </body>
 </html>
-
-
-
